@@ -1,5 +1,9 @@
 import { Router } from 'express';
 import { getAllTrips, getTripById } from '../controllers/trips.js';
+import {
+  getSchedulesForTrip,
+  getSchedulesForTripAndMonth,
+} from '../controllers/schedules.js';
 
 const router = Router();
 
@@ -49,5 +53,57 @@ router.get('/trips', getAllTrips);
  *         description: Failed to fetch trip.
  */
 router.get('/trips/:id', getTripById);
+
+/**
+ * @openapi
+ * /api/trips/{id}/schedules:
+ *   get:
+ *     summary: Get schedules for a trip, optionally filtered by month
+ *     tags: [Schedules]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Trip ID
+ *         schema:
+ *           type: string
+ *         example: alpine-panorama
+ *       - in: query
+ *         name: month
+ *         required: false
+ *         description: Operating month, from January (1) to December (12)
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 12
+ *         example: 4
+ *     responses:
+ *       '200':
+ *         description: Matching schedules, or an empty array if none are available.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: integer }
+ *                   tripId: { type: string }
+ *                   departureTime: { type: string, example: '08:30' }
+ *                   arrivalTime: { type: string, example: '13:00' }
+ *                   daysOfWeek: { type: array, items: { type: string } }
+ *                   status: { type: boolean }
+ *       '400':
+ *         description: Invalid month. Expected a whole number from 1 to 12.
+ *       '500':
+ *         description: Failed to fetch schedules.
+ */
+router.get('/trips/:id/schedules', (req, res) => {
+  if (req.query.month !== undefined) {
+    return getSchedulesForTripAndMonth(req, res);
+  }
+
+  return getSchedulesForTrip(req, res);
+});
 
 export default router;
