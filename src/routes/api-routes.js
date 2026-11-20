@@ -4,6 +4,7 @@ import {
   getSchedulesForTrip,
   getSchedulesForTripAndMonth,
 } from '../controllers/schedules.js';
+import { getAllBookings } from '../controllers/bookings.js';
 
 const router = Router();
 
@@ -105,5 +106,47 @@ router.get('/trips/:id/schedules', (req, res) => {
 
   return getSchedulesForTrip(req, res);
 });
+
+/**
+ * @openapi
+ * /api/bookings:
+ *   get:
+ *     summary: List all bookings, newest first
+ *     tags: [Bookings]
+ *     responses:
+ *       '200':
+ *         description: All bookings, or an empty array if none exist.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id: { type: string }
+ *                   tripId: { type: string }
+ *                   scheduleId: { type: integer }
+ *                   ticketClass: { type: string }
+ *                   selectedDay: { type: string }
+ *                   createdAt: { type: string, format: date-time }
+ *                   passengers:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         firstName: { type: string }
+ *                         lastName: { type: string }
+ *                         email: { type: string, format: email }
+ *                         phone: { type: string }
+ *       '500':
+ *         description: Failed to fetch bookings.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error: { type: string }
+ */
+router.get('/bookings', getAllBookings);
 
 export default router;

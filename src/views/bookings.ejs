@@ -1,0 +1,60 @@
+<%- include('./partials/header') %>
+
+<h1><%= title %></h1>
+<p id="booking-status" role="status">Loading bookings...</p>
+
+<table id="bookings-table" hidden>
+    <thead>
+        <tr>
+            <th scope="col">Booking code</th>
+            <th scope="col">Trip</th>
+            <th scope="col">Day</th>
+            <th scope="col">Ticket class</th>
+            <th scope="col">Passengers</th>
+        </tr>
+    </thead>
+    <tbody id="booking-rows"></tbody>
+</table>
+
+<script type="module">
+    const table = document.querySelector('#bookings-table');
+    const rows = document.querySelector('#booking-rows');
+    const status = document.querySelector('#booking-status');
+
+    async function loadBookings() {
+        const response = await fetch('/api/bookings');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const bookings = await response.json();
+
+        if (bookings.length === 0) {
+            status.textContent = 'No bookings yet.';
+            return;
+        }
+
+        for (const booking of bookings) {
+            const row = rows.insertRow();
+            const values = [
+                booking.id,
+                booking.tripId,
+                booking.selectedDay,
+                booking.ticketClass,
+                booking.passengers.length
+            ];
+
+            for (const value of values) {
+                row.insertCell().textContent = value;
+            }
+        }
+
+        status.hidden = true;
+        table.hidden = false;
+    }
+
+    loadBookings().catch(error => {
+        console.error(error);
+        status.textContent = 'Unable to load bookings. Please refresh to try again.';
+    });
+</script>
+
+<%- include('./partials/footer') %>

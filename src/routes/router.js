@@ -3,6 +3,7 @@ import { trainsApi, trainsPage } from './trains.js';
 import { Router } from 'express';
 import { homePage, aboutPage, testErrorPage } from './index.js';
 import tripsApiRouter from './api-routes.js';
+import { bookingsAdminPage } from '../controllers/bookings.js';
 
 const router = Router();
 
@@ -24,5 +25,8 @@ router.use('/trips', railTripsRouter);
 
 // Test 500 error page
 router.get('/500', testErrorPage);
+
+// Bookings admin page
+router.get('/bookings-admin', bookingsAdminPage);
 
 export default router;
