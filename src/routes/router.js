@@ -4,6 +4,8 @@ import { Router } from 'express';
 import { homePage, aboutPage, testErrorPage } from './index.js';
 import tripsApiRouter from './api-routes.js';
 import { bookingsAdminPage } from '../controllers/bookings.js';
+import { registerPage, loginPage, register, login, logout } from '../controllers/auth.js';
+import { requirePageRole } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -28,5 +30,23 @@ router.get('/500', testErrorPage);
 
 // Bookings admin page
 router.get('/bookings-admin', bookingsAdminPage);
+
+router.get('/register', registerPage);
+router.get('/login', loginPage);
+
+router.get('/register', registerPage);
+router.post('/register', register);
+
+router.get('/login', loginPage);
+router.post('/login', login);
+router.post('/logout', logout);
+
+router.get('/403', (req, res) => {
+  return res.status(403).render('errors/403', { title: 'Access denied' });
+});
+
+router.get('/admin', requirePageRole('admin'), (req, res) => {
+  return res.render('admin', { title: 'Admin Dashboard' });
+});
 
 export default router;
